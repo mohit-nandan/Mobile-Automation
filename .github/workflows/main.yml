@@ -1,0 +1,42 @@
+name: Mobile Automation CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - preprod
+          - prod
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run WDIO Tests
+      run: npm run wdio
+      env:
+        ENV: ${{ github.event.inputs.environment || 'staging' }}
+        # Note: For mobile automation in CI, you would typically use a service 
+        # like BrowserStack, Sauce Labs, or an emulator-in-docker setup.
+        # This setup assumes your wdio.conf.ts is configured for such a service.

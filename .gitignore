@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+.npm/
+
+# Testing
+reports/
+allure-results/
+errorShots/
+screenshots/
+logs/
+.jsons/
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment variables
+.env
+.env.local
+
+# APK Files
+apps/
+*.apk

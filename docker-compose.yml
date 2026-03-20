@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # Appium Server
+  appium:
+    image: appium/appium:latest
+    container_name: appium_server
+    ports:
+      - "4723:4723"
+    privileged: true
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+    # For Android Emulator in Docker, consider using budtmo/docker-android
+    # This setup assumes you are connecting to a remote device or a local emulator via host network
+
+  # Test Runner
+  tests:
+    build: .
+    container_name: wdio_tests
+    depends_on:
+      - appium
+    environment:
+      - APPIUM_HOST=appium
+      - APPIUM_PORT=4723
+    volumes:
+      - ./reports:/usr/src/app/reports
+      - ./errorShots:/usr/src/app/errorShots
