@@ -1,6 +1,6 @@
-import { stagingConfig } from './environments/staging.js';
-import { preprodConfig } from './environments/preprod.js';
-import { prodConfig } from './environments/prod.js';
+import { stagingConfig } from './environments/staging';
+import { preprodConfig } from './environments/preprod';
+import { prodConfig } from './environments/prod';
 
 const ENV = process.env.ENV || 'staging';
 
