@@ -29,7 +29,7 @@ export const config: WebdriverIO.Config = {
     // Test Configurations
     // ===================
     logLevel: 'info',
-    bail: 0,
+    bail: 1,
     baseUrl: environment.baseUrl,
     waitforTimeout: 10000,
     connectionRetryTimeout: 120000,
@@ -52,6 +52,7 @@ export const config: WebdriverIO.Config = {
     ],
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: 60000,
+        bail: true
     }
 }

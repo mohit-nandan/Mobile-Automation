@@ -1,22 +1,36 @@
 import BasePage from "./BasePage";
-import { browser } from '@wdio/globals';
 import * as fs from "fs";
 import db from "../utils/DatabaseUtil";
 
-class OtpPage extends BasePage {
+class LoginOnboardingPage extends BasePage {
 
-    get currentPhoneNumber() {
-        return JSON.parse(fs.readFileSync("./utils/Fixtures/staging/onboarding.json", "utf-8")).DynamicData.phone;
+    async getPhoneNumber() {
+        const data = JSON.parse(fs.readFileSync("./utils/Fixtures/staging/onboarding.json", "utf-8"));
+        return data.DynamicData.phone;
     }
 
-    getOtpField(index: number) {
+    async getOtpField(index: number) {
         return $(`android=new UiSelector().resourceId("otp-input").instance(${index})`);
     }
 
-    async getOtpFromDatabase() {
+    async getinputfield() {
+        const el = await $('android=new UiSelector().text("Eg: 9879879870")');
+        await el.waitForDisplayed();
+        return el;
+    }
+
+    async LoginWithPhoneNumber() {
+        const input = await this.getinputfield();
+        const phone = await this.getPhoneNumber();
+        await input.setValue(phone);
+        await this.waitForVisible('~Proceed');
+        await this.click('~Proceed');
+    }
+
+    async getOTPfromDatabase() {
         try {
             for (let i = 0; i < 15; i++) {
-                const dbPhone = "+91" + this.currentPhoneNumber;
+                const dbPhone = "+91" + await this.getPhoneNumber();
                 const otp = await db("zippeeriderapp_rider").select("otp").where("phone_number", dbPhone).orderBy("id", "desc").first();
                 if (otp && otp.otp) {
                     this.log("OTP: " + otp.otp);
@@ -27,13 +41,13 @@ class OtpPage extends BasePage {
             this.log("OTP not found after wait");
             return null;
         } catch (error) {
-            this.log("Error in getOtpFromDatabase" + error);
+            this.log("Error in GetOtpfromDatabase" + error);
         }
     }
 
     async enterOtp() {
         await this.waitForVisible('android=new UiSelector().resourceId("otp-input").instance(0)');
-        const otp = await this.getOtpFromDatabase();
+        const otp = await this.getOTPfromDatabase();
         if (otp) {
             const el = await this.getOtpField(0);
             await el.click();
@@ -46,7 +60,6 @@ class OtpPage extends BasePage {
         await this.waitForVisible('android=new UiSelector().text("Submit")');
         await this.click('android=new UiSelector().text("Submit")');
     }
-
 }
 
-export default new OtpPage();
+export default new LoginOnboardingPage();

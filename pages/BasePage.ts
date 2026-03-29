@@ -75,25 +75,45 @@ export default class BasePage {
         await $(`android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("${text}"))`);
     }
 
-    // async swipeUp() {
-    //     const { height, width } = await browser.getWindowSize();
+    async swipeUp(startYPercentage = 0.8, endYPercentage = 0.2, duration = 1000) {
+        const { height, width } = await browser.getWindowSize();
+        await driver.performActions([
+            {
+                type: 'pointer',
+                id: 'finger1',
+                parameters: { pointerType: 'touch' },
+                actions: [
+                    { type: 'pointerMove', duration: 0, x: Math.round(width / 2), y: Math.round(height * startYPercentage) },
+                    { type: 'pointerDown', button: 0 },
+                    { type: 'pause', duration: 100 },
+                    { type: 'pointerMove', duration: duration, x: Math.round(width / 2), y: Math.round(height * endYPercentage) },
+                    { type: 'pointerUp', button: 0 }
+                ]
+            }
+        ]);
+        await driver.releaseActions();
+        await browser.pause(500);
+    }
 
-    //     await browser.touchAction([
-    //         { action: 'press', x: width / 2, y: height * 0.8 },
-    //         { action: 'moveTo', x: width / 2, y: height * 0.2 },
-    //         'release'
-    //     ]);
-    // }
-
-    // async swipeDown() {
-    //     const { height, width } = await browser.getWindowSize();
-
-    //     await browser.touchAction([
-    //         { action: 'press', x: width / 2, y: height * 0.2 },
-    //         { action: 'moveTo', x: width / 2, y: height * 0.8 },
-    //         'release'
-    //     ]);
-    // }
+    async swipeDown(startYPercentage = 0.2, endYPercentage = 0.8, duration = 1000) {
+        const { height, width } = await browser.getWindowSize();
+        await driver.performActions([
+            {
+                type: 'pointer',
+                id: 'finger1',
+                parameters: { pointerType: 'touch' },
+                actions: [
+                    { type: 'pointerMove', duration: 0, x: Math.round(width / 2), y: Math.round(height * startYPercentage) },
+                    { type: 'pointerDown', button: 0 },
+                    { type: 'pause', duration: 100 },
+                    { type: 'pointerMove', duration: duration, x: Math.round(width / 2), y: Math.round(height * endYPercentage) },
+                    { type: 'pointerUp', button: 0 }
+                ]
+            }
+        ]);
+        await driver.releaseActions();
+        await browser.pause(500);
+    }
 
     // ======================
     // APP CONTROL

@@ -1,0 +1,32 @@
+{
+    "Login": {
+        "firstName": "Testing"
+    },
+    "VehicleInfo": {
+        "rcNumber": "UP78HF0533"
+    },
+    "KYCInfo": {
+        "panNumber": "CLVPN6067L",
+        "aadhaarNumber": "111111111111"
+    },
+    "ProfileSetup": {
+        "pincode": "208017",
+        "address": "123 Main St"
+    },
+    "BankDetails": {
+        "accountHolder": "John Doe",
+        "accountNumber": "1111111111111111",
+        "bankName": "HDFC Bank",
+        "ifscCode": "CBIN0285007",
+        "branchName": "HDFC Bank"
+    },
+    "Nomination": {
+        "nomineeName": "John Doe",
+        "nomineeContact": "9876543210",
+        "emergencyName": "John Doe",
+        "emergencyContact": "9876543210"
+    },
+    "DynamicData": {
+        "phone": 6000000185
+    }
+}

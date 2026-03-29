@@ -1,106 +1,74 @@
 import BasePage from "./BasePage";
+import onboardingData from "../utils/Fixtures/staging/onboarding.json";
 
 class VehicleInfoPage extends BasePage {
 
+    get vehicleOwnershipField() { return 'android=new UiSelector().description("eg: Owned")'; }
+    get vehicleOwnershipOption() { return 'android=new UiSelector().description("Owned")'; }
+
+    get vehicleTypeField() { return 'android=new UiSelector().description("Select your Vehicle Type")'; }
+    get vehicleTypeOption() { return 'android=new UiSelector().description("Bike (2-wheeler)")'; }
+
+    get cameraOption() { return 'android=new UiSelector().text("Camera")'; }
+    get cameraShutterBtn() { return 'android=new UiSelector().className("android.view.ViewGroup").instance(6)'; }
+
+    get rcNumberField() { return 'android=new UiSelector().text("Eg: UP01DR1234")'; }
+
+    get genericUploadDocBtn() { return 'android=new UiSelector().description("Upload")'; }
+    get submitBtn() { return '~Submit'; }
+
     async SelectVehicleOwnerShip() {
-        await this.waitForVisible('android=new UiSelector().description("eg: Owned")');
-        await this.click('android=new UiSelector().description("eg: Owned")');
-        await this.click('android=new UiSelector().description("Owned")');
+        await this.waitForVisible(this.vehicleOwnershipField);
+        await this.click(this.vehicleOwnershipField);
+        await this.click(this.vehicleOwnershipOption);
     }
 
     async SelectVehicleType() {
-        const { height, width } = await browser.getWindowSize();
-        await driver.performActions([
-            {
-                type: 'pointer',
-                id: 'finger1',
-                parameters: { pointerType: 'touch' },
-                actions: [
-                    { type: 'pointerMove', duration: 0, x: Math.round(width / 2), y: Math.round(height * 0.8) },
-                    { type: 'pointerDown', button: 0 },
-                    { type: 'pause', duration: 100 },
-                    { type: 'pointerMove', duration: 1000, x: Math.round(width / 2), y: Math.round(height * 0.3) },
-                    { type: 'pointerUp', button: 0 }
-                ]
-            }
-        ]);
-        await driver.releaseActions();
-        await this.waitForVisible('android=new UiSelector().description("Select your Vehicle Type")');
-        await this.click('android=new UiSelector().description("Select your Vehicle Type")');
-        await this.click('android=new UiSelector().description("Bike (2-wheeler)")');
+        await this.swipeUp(1000);
+        await this.waitForVisible(this.vehicleTypeField);
+        await this.click(this.vehicleTypeField);
+        await this.click(this.vehicleTypeOption);
     }
 
     async capturePhotoFromCamera(uploadIndex: number) {
         await this.click(`android=new UiSelector().description("Upload").instance(${uploadIndex})`);
-
-        await this.click('android=new UiSelector().text("Camera")');
-
+        await this.waitForVisible(this.cameraOption);
+        await this.click(this.cameraOption);
         await this.handlePermissions();
 
-        await this.pause(2000);
-
-        await this.click('android=new UiSelector().className("android.view.ViewGroup").instance(6)');
-
-        await this.pause(2000);
+        await this.pause(2000); // UI renders before camera hardware is ready
+        await this.click(this.cameraShutterBtn);
+        await this.pause(2000); // Allow camera to process
     }
 
     async uploadRC() {
         await this.capturePhotoFromCamera(0);
-        await this.waitForVisible('android=new UiSelector().text("Eg: UP01DR1234")');
-        const element = await $('android=new UiSelector().text("Eg: UP01DR1234")');
-        await this.type(element, 'UP78HF0533');
+        await this.waitForVisible(this.rcNumberField);
+        const element = await $(this.rcNumberField);
+        await this.type(element, onboardingData.VehicleInfo.rcNumber);
     }
 
     async uploadDL() {
-        const { height, width } = await browser.getWindowSize();
-        await driver.performActions([
-            {
-                type: 'pointer',
-                id: 'finger1',
-                parameters: { pointerType: 'touch' },
-                actions: [
-                    { type: 'pointerMove', duration: 0, x: Math.round(width / 2), y: Math.round(height * 0.8) },
-                    { type: 'pointerDown', button: 0 },
-                    { type: 'pause', duration: 100 },
-                    { type: 'pointerMove', duration: 1000, x: Math.round(width / 2), y: Math.round(height * 0.3) },
-                    { type: 'pointerUp', button: 0 }
-                ]
-            }
-        ]);
-        await driver.releaseActions();
+        await this.swipeUp(1000);
         await this.capturePhotoFromCamera(0);
     }
 
     async insuranceUpload() {
-        const { height, width } = await browser.getWindowSize();
-        await driver.performActions([
-            {
-                type: 'pointer',
-                id: 'finger1',
-                parameters: { pointerType: 'touch' },
-                actions: [
-                    { type: 'pointerMove', duration: 0, x: Math.round(width / 2), y: Math.round(height * 0.8) },
-                    { type: 'pointerDown', button: 0 },
-                    { type: 'pause', duration: 100 },
-                    { type: 'pointerMove', duration: 1000, x: Math.round(width / 2), y: Math.round(height * 0.3) },
-                    { type: 'pointerUp', button: 0 }
-                ]
-            }
-        ]);
-        await driver.releaseActions();
-        await this.waitForVisible('android=new UiSelector().description("Upload")');
-        await this.click('android=new UiSelector().description("Upload")');
-        await this.click('android=new UiSelector().text("Camera")');
+        await this.swipeUp(1000);
+        await this.waitForVisible(this.genericUploadDocBtn);
+        await this.click(this.genericUploadDocBtn);
+        await this.waitForVisible(this.cameraOption);
+        await this.click(this.cameraOption);
         await this.handlePermissions();
-        await this.pause(2000);
-        await this.click('android=new UiSelector().className("android.view.ViewGroup").instance(6)');
-        await this.pause(2000);
 
+        await this.waitForVisible(this.cameraShutterBtn);
+        await this.click(this.cameraShutterBtn);
+        await this.pause(2000); // Allow camera to process
     }
 
     async clickVehicleInfoSubmitButton() {
-        await this.waitForVisible('~Submit');
-        await this.click('~Submit');
+        await this.waitForVisible(this.submitBtn);
+        await this.click(this.submitBtn);
     }
 }
 

@@ -1,14 +1,15 @@
 import * as fs from 'fs';
 
-const DATA_FILE = './utils/Fixtures/Phone.json';
+const DATA_FILE = './utils/Fixtures/staging/onboarding.json';
 
 export function getNextPhoneNumber() {
     const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
-    let phone = data.phone;
+    let phone = data.DynamicData.phone;
 
     phone = phone + 1;
+    data.DynamicData.phone = phone;
 
-    fs.writeFileSync(DATA_FILE, JSON.stringify({ phone }, null, 2));
+    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
 
     return phone;
 }
