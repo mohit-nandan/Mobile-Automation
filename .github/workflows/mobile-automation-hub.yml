@@ -27,7 +27,7 @@ on:
 
 jobs:
   run-task:
-    runs-on: macos-13 # Explicit Intel runner for stable x86_64 virtualization
+    runs-on: macos-latest # Using modern Apple Silicon runners
     
     steps:
     - name: Free Disk Space
@@ -54,7 +54,7 @@ jobs:
       with:
         api-level: 30
         target: google_apis
-        arch: x86_64
+        arch: arm64-v8a # Must match Apple Silicon runner for hardware speed
         profile: pixel_6
         disable-animations: true
         emulator-options: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim
