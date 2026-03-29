@@ -1,14 +1,165 @@
-import { browser } from '@wdio/globals'
-
-/**
-* main page object containing all methods, selectors and functionality
-* that is shared across all page objects
-*/
+import { browser } from '@wdio/globals';
+import type { ChainablePromiseElement } from 'webdriverio';
 export default class BasePage {
-    /**
-    * Opens a sub page of the page
-    * @param path path of the sub page (e.g. /path/to/page.html)
-    */
+
+    // ======================
+    // ELEMENT ACTIONS
+    // ======================
+
+    async click(selector: string) {
+        const element = await $(selector);
+        await element.waitForDisplayed({ timeout: 10000 });
+        await element.click();
+    }
+
+    async type(element: ChainablePromiseElement, value: string) {
+        const el = await element;
+
+        await el.waitForDisplayed({ timeout: 10000 });
+        await el.setValue(value);
+    }
+
+    async getText(selector: string) {
+        const element = await $(selector);
+        await element.waitForDisplayed({ timeout: 10000 });
+        return await element.getText();
+    }
+
+    async isDisplayed(selector: string) {
+        const element = await $(selector);
+        return await element.isDisplayed();
+    }
+
+    // ======================
+    // WAIT METHODS
+    // ======================
+
+    async waitForVisible(selector: string) {
+        const element = await $(selector);
+        await element.waitForDisplayed({ timeout: 10000 });
+    }
+
+    async waitForClickable(selector: string) {
+        const element = await $(selector);
+        await element.waitForClickable({ timeout: 10000 });
+    }
+
+    async waitForHidden(selector: string) {
+        const element = await $(selector);
+        await element.waitForDisplayed({ reverse: true, timeout: 10000 });
+    }
+
+    // ======================
+    // CONDITIONAL ACTIONS
+    // ======================
+
+    async clickIfDisplayed(selector: string) {
+        const element = await $(selector);
+        if (await element.isDisplayed()) {
+            await element.click();
+        }
+    }
+
+    async typeIfDisplayed(selector: string, text: string) {
+        const element = await $(selector);
+        if (await element.isDisplayed()) {
+            await element.setValue(text);
+        }
+    }
+
+    // ======================
+    // SCROLL / SWIPE
+    // ======================
+
+    async scrollToText(text: string) {
+        await $(`android=new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("${text}"))`);
+    }
+
+    async swipeUp(startYPercentage = 0.8, endYPercentage = 0.2, duration = 1000) {
+        const { height, width } = await browser.getWindowSize();
+        await driver.performActions([
+            {
+                type: 'pointer',
+                id: 'finger1',
+                parameters: { pointerType: 'touch' },
+                actions: [
+                    { type: 'pointerMove', duration: 0, x: Math.round(width / 2), y: Math.round(height * startYPercentage) },
+                    { type: 'pointerDown', button: 0 },
+                    { type: 'pause', duration: 100 },
+                    { type: 'pointerMove', duration: duration, x: Math.round(width / 2), y: Math.round(height * endYPercentage) },
+                    { type: 'pointerUp', button: 0 }
+                ]
+            }
+        ]);
+        await driver.releaseActions();
+        await browser.pause(500);
+    }
+
+    async swipeDown(startYPercentage = 0.2, endYPercentage = 0.8, duration = 1000) {
+        const { height, width } = await browser.getWindowSize();
+        await driver.performActions([
+            {
+                type: 'pointer',
+                id: 'finger1',
+                parameters: { pointerType: 'touch' },
+                actions: [
+                    { type: 'pointerMove', duration: 0, x: Math.round(width / 2), y: Math.round(height * startYPercentage) },
+                    { type: 'pointerDown', button: 0 },
+                    { type: 'pause', duration: 100 },
+                    { type: 'pointerMove', duration: duration, x: Math.round(width / 2), y: Math.round(height * endYPercentage) },
+                    { type: 'pointerUp', button: 0 }
+                ]
+            }
+        ]);
+        await driver.releaseActions();
+        await browser.pause(500);
+    }
+
+    // ======================
+    // APP CONTROL
+    // ======================
+
+    async resetApp() {
+        await browser.reloadSession();
+    }
+
+    async pause(ms: number) {
+        await browser.pause(ms);
+    }
+
+    // ======================
+    // ALERT / PERMISSIONS
+    // ======================
+
+    async acceptAlert() {
+        try {
+            await browser.acceptAlert();
+        } catch (e) {
+            console.log("No alert present");
+        }
+    }
+
+    async handlePermissions() {
+        try {
+            const allowBtn = await $('//android.widget.Button[@text="Allow"]');
+            if (await allowBtn.isDisplayed()) {
+                await allowBtn.click();
+            }
+        } catch (e) { }
+    }
+
+    // ======================
+    // DEBUG / UTIL
+    // ======================
+
+    async log(message: string) {
+        console.log(`🔹 ${message}`);
+    }
+
+    async takeScreenshot(name: string) {
+        await browser.saveScreenshot(`./screenshots/${name}.png`);
+    }
+
     public open(path: string) {
         return browser.url(`https://the-internet.herokuapp.com/${path}`)
     }

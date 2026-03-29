@@ -12,11 +12,3 @@ export const capabilities = {
     "appium:noReset": true
 };
 
-
-// {
-//   "platformName": "Android",
-//   "appium:automationName": "UiAutomator2",
-//   "appium:deviceName": "emulator-5554", 
-//   "appium:newCommandTimeout": 3600,
-//   "appium:noReset": true
-// }

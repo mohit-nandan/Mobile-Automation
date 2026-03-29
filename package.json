@@ -15,6 +15,9 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "dotenv": "^17.3.1",
+    "knex": "^3.1.0",
+    "mysql2": "^3.20.0",
     "webdriverio": "^9.25.0"
   },
   "devDependencies": {

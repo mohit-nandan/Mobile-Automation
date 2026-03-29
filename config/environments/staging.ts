@@ -1,12 +1,14 @@
 export const stagingConfig = {
     baseUrl: 'https://staging.zipppee.com',
+    apiUrl: 'https://api.zfwhospitality.in',
     capabilities: {
         platformName: 'Android',
         'appium:automationName': 'UiAutomator2',
         'appium:deviceName': 'emulator-5554',
         'appium:app': 'C:\\Users\\User\\Desktop\\mobile-automation\\apps\\zipppee-staging.apk',
-        'appium:appPackage': 'com.zippee.ridercod.staging',
+        'appium:appPackage': 'com.zippee.ridercod',
         'appium:appActivity': 'com.zippee.ridercod.MainActivity',
-        'appium:noReset': true
+        'appium:noReset': false,
+        'appium:autoGrantPermissions': true
     }
 };

@@ -1,5 +1,5 @@
 import { $ } from '@wdio/globals'
-import BasePage from './BasePage.js';
+import BasePage from './BasePage';
 
 /**
  * sub page containing specific selectors and methods for a specific page

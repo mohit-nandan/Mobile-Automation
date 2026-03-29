@@ -1,4 +1,4 @@
-import { environment } from './config/env.config.js';
+import { environment } from './config/env.config';
 
 export const config: WebdriverIO.Config = {
     //
@@ -29,24 +29,30 @@ export const config: WebdriverIO.Config = {
     // Test Configurations
     // ===================
     logLevel: 'info',
-    bail: 0,
+    bail: 1,
     baseUrl: environment.baseUrl,
     waitforTimeout: 10000,
     connectionRetryTimeout: 120000,
     connectionRetryCount: 3,
-    services: ['visual'],
+    protocol: 'http',
+    hostname: 'localhost',
+    port: 4723,
+    path: '/',
+    // services: ['visual'],
+    services: [],
     framework: 'mocha',
     reporters: [
         'spec',
-        ['mochawesome', {
-            outputDir: './reports',
-            outputFileFormat: function (opts) {
-                return `results-${opts.cid}.json`
-            }
-        }]
+        // ['mochawesome', {
+        //     outputDir: './reports',
+        //     outputFileFormat: function (opts) {
+        //         return `results-${opts.cid}.json`
+        //     }
+        // }]
     ],
     mochaOpts: {
         ui: 'bdd',
-        timeout: 60000
+        timeout: 60000,
+        bail: true
     }
 }
