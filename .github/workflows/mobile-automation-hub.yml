@@ -26,7 +26,7 @@ on:
 
 jobs:
   run-task:
-    runs-on: macos-latest
+    runs-on: self-hosted
 
     steps:
     - name: Checkout Repository
@@ -41,72 +41,23 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Run Android Emulator & Tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 29
-        target: default
-        arch: x86_64
-        profile: pixel
-        emulator-boot-timeout: 600
-        disable-animations: true
-        emulator-options: >
-          -no-window
-          -no-audio
-          -no-boot-anim
-          -gpu swiftshader_indirect
-          -accel off
-          -no-snapshot
-          -memory 2048
+    - name: Run Tests
+      shell: pwsh
+      run: |
+        # Resolve environment - use input or default to staging for scheduled runs
+        $ENV = if ("${{ github.event.inputs.environment }}" -ne "") { "${{ github.event.inputs.environment }}" } else { "staging" }
+        $FLOW = if ("${{ github.event.inputs.test_flow }}" -ne "") { "${{ github.event.inputs.test_flow }}" } else { "Onboarding" }
 
-        script: |
-          echo "🔁 Restarting ADB..."
-          adb kill-server || true
-          adb start-server
-          adb devices
+        Write-Host "Environment: $ENV"
+        Write-Host "Flow: $FLOW"
 
-          echo "⏳ Waiting for emulator to boot..."
-          adb wait-for-device
+        # Map flow to spec file
+        $SPEC_FILE = switch ($FLOW) {
+          "Onboarding"     { "tests/Smoke/Onboarding.ts" }
+          "Delivery Flow"  { "tests/Smoke/Delivery.ts" }
+          "Return To Store"{ "tests/Smoke/Return.ts" }
+          default          { Write-Error "Unknown flow: $FLOW"; exit 1 }
+        }
 
-          boot_completed=""
-          until [[ "$boot_completed" == "1" ]]; do
-            boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-            echo "Boot status: $boot_completed"
-            sleep 5
-          done
-
-          echo "✅ Emulator booted!"
-
-          echo "🚀 Starting Appium..."
-          npx appium --log-level error &
-          
-          sleep 10
-
-          echo "🔧 Setting environment variables..."
-
-          ENV="${{ github.event.inputs.environment }}"
-          FLOW="${{ github.event.inputs.test_flow }}"
-
-          if [ -z "$ENV" ]; then 
-            ENV="staging"
-            echo "Default ENV: $ENV"
-          fi
-
-          if [ -z "$FLOW" ]; then 
-            FLOW="Onboarding"
-            echo "Default FLOW: $FLOW"
-          fi
-
-          if [ "$FLOW" == "Onboarding" ]; then
-            SPEC_FILE="tests/Smoke/Onboarding.ts"
-          elif [ "$FLOW" == "Delivery Flow" ]; then
-            SPEC_FILE="tests/Smoke/Delivery.ts"
-          elif [ "$FLOW" == "Return To Store" ]; then
-            SPEC_FILE="tests/Smoke/Return.ts"
-          else
-            echo "❌ Invalid flow"
-            exit 1
-          fi
-
-          echo "🧪 Running tests..."
-          npm run test:$ENV -- --spec $SPEC_FILE
+        Write-Host "Running: npm run test:$ENV -- --spec $SPEC_FILE"
+        & npm run "test:$ENV" -- --spec $SPEC_FILE
