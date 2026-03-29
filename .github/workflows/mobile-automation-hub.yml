@@ -27,9 +27,16 @@ on:
 
 jobs:
   run-task:
-    runs-on: macos-latest
+    runs-on: macos-13 # Explicit Intel runner for stable x86_64 virtualization
     
     steps:
+    - name: Free Disk Space
+      run: |
+        sudo rm -rf /Library/Developer/CommandLineTools
+        sudo rm -rf /usr/local/lib/node_modules
+        sudo rm -rf /usr/local/share/boost
+        sudo rm -rf /usr/share/dotnet
+        
     - name: Checkout Repository
       uses: actions/checkout@v4
 
@@ -49,6 +56,8 @@ jobs:
         target: google_apis
         arch: x86_64
         profile: pixel_6
+        disable-animations: true
+        emulator-options: -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim
         script: |
           echo "Starting Appium Server..."
           npx appium --use-plugins=inspector --allow-cors &
